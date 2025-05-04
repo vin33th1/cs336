@@ -14,18 +14,19 @@
 	+ "'");
 	if (rs.next()) {
 		session.setAttribute("user", username); // the username will be stored in the session
-		session.setAttribute("user_type", rs.getString("user_type")); // also stores user_type in the session
+		session.setAttribute("UserType", rs.getString("UserType")); // also stores user_type in the session
 		
-		String userType= rs.getString("user_type");
-		if("admin".equals(userType)) {
+		String userType= rs.getString("UserType");
+		if("Admin".equals(userType)) {
 			response.sendRedirect("Admin/AdminDash.jsp");
-		} else if ("customerrep".equals(userType)) {
+		} else if ("Representative".equals(userType)) {
 			response.sendRedirect("CustomerRep/RepDash.jsp");
-		} else if ("customer".equals(userType)) {
+		} else if ("Customer".equals(userType)) {
 			response.sendRedirect("Customer/CustomerDash.jsp");
 		}
 		else{
 			out.println("Invalid Credentials <a href = index.jsp> try again</a>");
+			out.println(userType);
 		}
 		
 		
