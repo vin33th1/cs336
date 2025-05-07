@@ -6,6 +6,11 @@
 <html>
 <head>
     <title>Customer Dashboard</title>
+    <style>
+        .form-group { margin-bottom: 10px; }
+        label { display: inline-block; width: 150px; }
+        .advanced-options { margin-top: 20px; border: 1px solid #ccc; padding: 15px; }
+    </style>
 </head>
 <body>
 <h1>Customer Dashboard</h1>
@@ -64,6 +69,49 @@
             <div class="form-group" id="returnDateGroup" style="display:none;">
                 <label for="returnDate">Return Date:</label>
                 <input type="date" name="returnDate" id="returnDate">
+            </div>
+            
+            <div class="form-group">
+                <label for="dateFlexibility">Date Flexibility:</label>
+                <select name="dateFlexibility" id="dateFlexibility">
+                    <option value="0">Exact date only</option>
+                    <option value="1">+/- 1 day</option>
+                    <option value="2">+/- 2 days</option>
+                    <option value="3">+/- 3 days</option>
+                </select>
+            </div>
+            
+            <div class="advanced-options">
+                <h3>Advanced Options</h3>
+                <div class="form-group">
+                    <label for="maxStops">Max Stops:</label>
+                    <select name="maxStops" id="maxStops">
+                        <option value="">Any</option>
+                        <option value="0">Non-stop only</option>
+                        <option value="1">Max 1 stop</option>
+                        <option value="2">Max 2 stops</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="airlineFilter">Airline:</label>
+                    <select name="airlineFilter" id="airlineFilter">
+                        <option value="">Any</option>
+                        <option value="AA">American Airlines</option>
+                        <option value="DL">Delta</option>
+                        <option value="UA">United</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="minPrice">Min Price:</label>
+                    <input type="number" name="minPrice" id="minPrice" min="0" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                    <label for="maxPrice">Max Price:</label>
+                    <input type="number" name="maxPrice" id="maxPrice" min="0" step="0.01">
+                </div>
             </div>
             
             <div class="form-group">
