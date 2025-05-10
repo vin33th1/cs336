@@ -10,6 +10,12 @@
         .form-group { margin-bottom: 10px; }
         label { display: inline-block; width: 150px; }
         .advanced-options { margin-top: 20px; border: 1px solid #ccc; padding: 15px; }
+        /* Added styles for tickets section */
+        .tickets-section { margin-top: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        .tickets-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .tickets-table th, .tickets-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .tickets-table th { background-color: #f2f2f2; }
+        .no-tickets { font-style: italic; color: #666; }
     </style>
 </head>
 <body>
@@ -82,7 +88,7 @@
             </div>
             
             <div class="advanced-options">
-                <h3>Advanced Options</h3>
+                <h3>Filter Search</h3>
                 <div class="form-group">
                     <label for="maxStops">Max Stops:</label>
                     <select name="maxStops" id="maxStops">
@@ -118,6 +124,76 @@
                 <input type="submit" value="Search Flights">
             </div>
         </form>
+    </div>
+
+    <!-- Added Tickets Section -->
+    <div class="tickets-section">
+        <h2>Your Booked Tickets</h2>
+        <%
+        ApplicationDB db = new ApplicationDB();    
+        Connection con = db.getConnection();
+        try {
+            String username = (String) session.getAttribute("user");
+            String ticketQuery = "SELECT t.TicketID, f.FlightNumber, a.AirlineID, " +
+                               "f.DepartureAirport, f.DepartureTime, f.ArrivalAirport, f.ArrivalTime, " +
+                               "f.FlightDate, t.SeatClass, t.BookingDate " +
+                               "FROM tickets t " +
+                               "JOIN flights f ON t.FlightID = f.FlightID " +
+                               "JOIN airlines a ON f.AirlineID = a.AirlineID " +
+                               "WHERE t.Username = ? " +
+                               "ORDER BY t.BookingDate DESC";
+            
+            PreparedStatement pstmt = con.prepareStatement(ticketQuery);
+            pstmt.setString(1, username);
+            ResultSet tickets = pstmt.executeQuery();
+            
+            if (!tickets.isBeforeFirst()) {
+        %>
+                <p class="no-tickets">You haven't booked any tickets yet.</p>
+        <%
+            } else {
+        %>
+                <table class="tickets-table">
+                    <tr>
+                        <th>Ticket ID</th>
+                        <th>Flight</th>
+                        <th>Departure</th>
+                        <th>Arrival</th>
+                        <th>Date</th>
+                        <th>Class</th>
+                        <th>Booked On</th>
+                    </tr>
+                    <%
+                    while (tickets.next()) {
+                        String departure = tickets.getString("DepartureAirport") + " " + tickets.getString("DepartureTime");
+                        String arrival = tickets.getString("ArrivalAirport") + " " + tickets.getString("ArrivalTime");
+                        String flightDate = tickets.getDate("FlightDate").toString();
+                        String bookingDate = tickets.getTimestamp("BookingDate").toString();
+                    %>
+                    <tr>
+                        <td><%= tickets.getInt("TicketID") %></td>
+                        <td><%= tickets.getString("AirlineID") %> <%= tickets.getString("FlightNumber") %></td>
+                        <td><%= departure %></td>
+                        <td><%= arrival %></td>
+                        <td><%= flightDate %></td>
+                        <td><%= tickets.getString("SeatClass") %></td>
+                        <td><%= bookingDate %></td>
+                    </tr>
+                    <%
+                    }
+                    %>
+                </table>
+        <%
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        %>
+            <p class="error">Error loading your tickets. Please try again later.</p>
+        <%
+        } finally {
+            if (con != null) con.close();
+        }
+        %>
     </div>
     
     <script>

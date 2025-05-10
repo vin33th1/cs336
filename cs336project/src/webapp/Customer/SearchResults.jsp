@@ -6,16 +6,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Flight Search Results</title>
-    <style>
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .sort-options { margin: 20px 0; }
-        .filter-options { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
-        th a { text-decoration: none; color: inherit; }
-        th a:hover { text-decoration: underline; }
-        .sort-indicator { color: blue; font-weight: bold; }
-    </style>
 </head>
 <body>
     <%
@@ -250,6 +240,19 @@
                     returnResult.close();
                 } 
                 %>
+                
+                <!-- Seat Class Selection -->
+                <div class="seat-selection">
+                    <h3>Select Seat Class</h3>
+                    <input type="radio" id="economy" name="seatClass" value="Economy" checked>
+                    <label for="economy">Economy</label><br>
+                    
+                    <input type="radio" id="business" name="seatClass" value="Business">
+                    <label for="business">Business</label><br>
+                    
+                    <input type="radio" id="first" name="seatClass" value="First">
+                    <label for="first">First Class</label>
+                </div>
                 
                 <input type="hidden" name="tripType" value="<%= tripType %>">
                 <input type="hidden" name="departDate" value="<%= departDate %>">
