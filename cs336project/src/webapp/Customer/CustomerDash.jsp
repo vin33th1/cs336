@@ -6,17 +6,6 @@
 <html>
 <head>
     <title>Customer Dashboard</title>
-    <style>
-        .form-group { margin-bottom: 10px; }
-        label { display: inline-block; width: 150px; }
-        .advanced-options { margin-top: 20px; border: 1px solid #ccc; padding: 15px; }
-        /* Added styles for tickets section */
-        .tickets-section { margin-top: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
-        .tickets-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .tickets-table th, .tickets-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        .tickets-table th { background-color: #f2f2f2; }
-        .no-tickets { font-style: italic; color: #666; }
-    </style>
 </head>
 <body>
 <h1>Customer Dashboard</h1>
@@ -127,14 +116,59 @@
     </div>
 
     <!-- Added Tickets Section -->
-   <div class="tickets-section">
+  <div class="tickets-section">
     <h2>Your Booked Tickets</h2>
     
-    <%-- (Existing cancellation handling code remains the same) --%>
+    <%-- Cancellation Handling --%>
     <%
-    // Handle cancellation before displaying tickets
     if ("POST".equalsIgnoreCase(request.getMethod()) && request.getParameter("cancelTicket") != null) {
-        // ... (keep all the existing cancellation code) ...
+        int ticketId = Integer.parseInt(request.getParameter("ticketId"));
+        Connection conCancel = null;
+        try {
+            ApplicationDB dbCancel = new ApplicationDB();    
+            conCancel = dbCancel.getConnection();
+            
+            // First check if the ticket is eligible for cancellation (Business or First class)
+            String checkQuery = "SELECT t.SeatClass, t.FlightID FROM tickets t WHERE t.TicketID = ? AND t.Username = ? AND t.Status = 'Active'";
+            PreparedStatement checkStmt = conCancel.prepareStatement(checkQuery);
+            checkStmt.setInt(1, ticketId);
+            checkStmt.setString(2, (String) session.getAttribute("user"));
+            ResultSet checkRs = checkStmt.executeQuery();
+            
+            if (checkRs.next()) {
+                String seatClass = checkRs.getString("SeatClass");
+                int flightId = checkRs.getInt("FlightID");
+                
+                if ("Business".equals(seatClass) || "First".equals(seatClass)) {
+                    // Update the ticket status to Cancelled
+                    String updateQuery = "UPDATE tickets SET Status = 'Cancelled', CancellationDate = NOW() WHERE TicketID = ?";
+                    PreparedStatement updateStmt = conCancel.prepareStatement(updateQuery);
+                    updateStmt.setInt(1, ticketId);
+                    int rowsAffected = updateStmt.executeUpdate();
+                    
+                    if (rowsAffected > 0) {
+                        // Increment the available seats for the flight
+                        String incrementSeats = "UPDATE flights SET " + seatClass + "Seats = " + seatClass + "Seats + 1 WHERE FlightID = ?";
+                        PreparedStatement incrementStmt = conCancel.prepareStatement(incrementSeats);
+                        incrementStmt.setInt(1, flightId);
+                        incrementStmt.executeUpdate();
+                        
+                        out.println("<p class='success'>Ticket #" + ticketId + " has been successfully cancelled.</p>");
+                    } else {
+                        out.println("<p class='error'>Failed to cancel ticket #" + ticketId + ". Please try again.</p>");
+                    }
+                } else {
+                    out.println("<p class='error'>Only Business or First class tickets can be cancelled.</p>");
+                }
+            } else {
+                out.println("<p class='error'>Ticket not found, already cancelled, or you don't have permission to cancel it.</p>");
+            }
+        } catch (Exception e) {
+            out.println("<p class='error'>Error processing cancellation: " + e.getMessage() + "</p>");
+            e.printStackTrace();
+        } finally {
+            if (conCancel != null) conCancel.close();
+        }
     }
     %>
 
@@ -235,7 +269,7 @@
                                "FROM tickets t " +
                                "JOIN flights f ON t.FlightID = f.FlightID " +
                                "JOIN airlines a ON f.AirlineID = a.AirlineID " +
-                               "WHERE t.Username = ? AND t.Status = 'Used' " +
+                               "WHERE t.Username = ? AND (t.Status = 'Used' OR t.Status = 'Cancelled') " +
                                "ORDER BY f.FlightDate DESC";
         
         PreparedStatement pstmtUsed = conUsed.prepareStatement(usedTicketQuery);
@@ -266,6 +300,7 @@
                     String flightDate = usedTickets.getDate("FlightDate").toString();
                     String bookingDate = usedTickets.getTimestamp("BookingDate").toString();
                     String seatClass = usedTickets.getString("SeatClass");
+                    String status = usedTickets.getString("Status");
                 %>
                 <tr>
                     <td><%= usedTickets.getInt("TicketID") %></td>
@@ -275,7 +310,7 @@
                     <td><%= flightDate %></td>
                     <td><%= seatClass %></td>
                     <td><%= bookingDate %></td>
-                    <td>Completed</td>
+                    <td><%= "Cancelled".equals(status) ? "Cancelled" : "Completed" %></td>
                 </tr>
                 <%
                 }
@@ -295,9 +330,27 @@
 </div>
 
 <script>
-    // (Existing JavaScript code remains the same)
+    // Show/hide return date based on trip type
+    document.getElementById('tripType').addEventListener('change', function() {
+        var returnDateGroup = document.getElementById('returnDateGroup');
+        if (this.value === 'RoundTrip') {
+            returnDateGroup.style.display = 'block';
+            document.getElementById('returnDate').required = true;
+        } else {
+            returnDateGroup.style.display = 'none';
+            document.getElementById('returnDate').required = false;
+        }
+    });
+    
+    // Set minimum return date based on departure date
+    document.getElementById('departDate').addEventListener('change', function() {
+        var returnDate = document.getElementById('returnDate');
+        returnDate.min = this.value;
+        if (returnDate.value && returnDate.value < this.value) {
+            returnDate.value = this.value;
+        }
+    });
 </script>
-
 <script>
     // Show/hide return date based on trip type
     document.getElementById('tripType').addEventListener('change', function() {
