@@ -75,7 +75,7 @@
     Connection con = db.getConnection();    
     
     try {
-        // Build the base query with filtering
+
         String query = "SELECT f.*, a.AirlineID FROM flights f " +
                       "JOIN airlines a ON f.AirlineID = a.AirlineID " +
                       "WHERE f.DepartureAirport = ? " +
@@ -178,7 +178,7 @@
                 </table>
                 
                 <% if ("RoundTrip".equals(tripType)) { 
-                    // Query for return flights if round trip
+                  
                     pstmt.setString(4, returnDate);
                     if (!(dateFlexibility == null || dateFlexibility.equals("0"))) {
                         pstmt.setString(5, returnDate);
@@ -240,8 +240,7 @@
                     returnResult.close();
                 } 
                 %>
-                
-                <!-- Seat Class Selection -->
+ 
                 <div class="seat-selection">
                     <h3>Select Seat Class</h3>
                     <input type="radio" id="economy" name="seatClass" value="Economy" checked>

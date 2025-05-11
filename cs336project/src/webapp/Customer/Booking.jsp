@@ -26,7 +26,7 @@
     Connection con = db.getConnection();
     
     try {
-        // Check if flight is available
+
         String checkFlightQuery = "SELECT * FROM flights WHERE FlightID = ?";
         PreparedStatement checkFlightStmt = con.prepareStatement(checkFlightQuery);
         checkFlightStmt.setInt(1, Integer.parseInt(flightID));

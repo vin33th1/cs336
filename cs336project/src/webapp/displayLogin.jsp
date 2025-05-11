@@ -14,7 +14,7 @@
 	+ "'");
 	if (rs.next()) {
 		session.setAttribute("user", username); // the username will be stored in the session
-		session.setAttribute("UserType", rs.getString("UserType")); // also stores user_type in the session
+		session.setAttribute("UserType", rs.getString("UserType")); // also stores UserType in the session
 		
 		String userType= rs.getString("UserType");
 		if("Admin".equals(userType)) {

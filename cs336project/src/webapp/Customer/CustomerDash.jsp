@@ -115,11 +115,11 @@
         </form>
     </div>
 
-    <!-- Added Tickets Section -->
+
   <div class="tickets-section">
     <h2>Your Booked Tickets</h2>
     
-    <%-- Cancellation Handling --%>
+
     <%
     if ("POST".equalsIgnoreCase(request.getMethod()) && request.getParameter("cancelTicket") != null) {
         int ticketId = Integer.parseInt(request.getParameter("ticketId"));
@@ -172,7 +172,7 @@
     }
     %>
 
-    <%-- Active Tickets Section --%>
+
     <h3>Active Tickets</h3>
     <%
     ApplicationDB db = new ApplicationDB();    
@@ -254,7 +254,7 @@
     }
     %>
 
-    <%-- Used Tickets Section --%>
+
     <h3 style="margin-top: 30px;">Past Flights</h3>
     <%
     Connection conUsed = null;
@@ -351,33 +351,12 @@
         }
     });
 </script>
-<script>
-    // Show/hide return date based on trip type
-    document.getElementById('tripType').addEventListener('change', function() {
-        var returnDateGroup = document.getElementById('returnDateGroup');
-        if (this.value === 'RoundTrip') {
-            returnDateGroup.style.display = 'block';
-            document.getElementById('returnDate').required = true;
-        } else {
-            returnDateGroup.style.display = 'none';
-            document.getElementById('returnDate').required = false;
-        }
-    });
-    
-    // Set minimum return date based on departure date
-    document.getElementById('departDate').addEventListener('change', function() {
-        var returnDate = document.getElementById('returnDate');
-        returnDate.min = this.value;
-        if (returnDate.value && returnDate.value < this.value) {
-            returnDate.value = this.value;
-        }
-    });
-</script>
-<!-- Questions & Answers Section -->
+
+
 <div class="qa-section" style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px;">
     <h2>Questions & Answers</h2>
     
-    <!-- Search Questions Form -->
+   
     <div class="search-questions" style="margin-bottom: 20px;">
         <h3>Search Questions</h3>
         <form method="get" action="">
@@ -390,7 +369,7 @@
         </form>
     </div>
     
-    <!-- Post Question Form -->
+
     <div class="post-question" style="margin-bottom: 30px; border: 1px solid #eee; padding: 15px; background-color: #f9f9f9;">
         <h3>Ask a Question</h3>
         <form method="post" action="">
